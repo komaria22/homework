@@ -34,7 +34,7 @@ class ServerProtocol(asyncio.Protocol):
             else:
                 self.all_users.append(self.login)
                 self.transport.write(
-                    f"Привет, {self.login}!\n".encode()
+                    f"Привет, {self.login}!\n".replace("\r\n", "").encode()
                 )
             self.send_history()
 
@@ -48,14 +48,14 @@ class ServerProtocol(asyncio.Protocol):
         print("Клиент вышел")
 
     def send_message(self, content: str):
-        message = f"{self.login}: {content}"
-        self.history.append(content)
+        message = f"{self.login}: {content}".replace("\r\n", "")
+        self.history.append(content.replace("\r\n", ""))
         for user in self.server.clients:
-            user.transport.write(message.encode())
+            user.transport.write(message.replace("\r\n", "").encode())
 
     def send_history(self):
         self.transport.write(
-            f"10 сообщений {self.history[0:11]}!\n".encode()
+            f"10 сообщений {self.history[0:21]}".replace("\r\n", "\n").encode()
         )
 
 class Server:
